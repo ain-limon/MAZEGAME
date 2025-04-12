@@ -17,6 +17,11 @@ public class MazeGame extends JPanel {
         start = new Point(1, 1);
         exit = new Point(this.rows - 2, this.cols - 2);
         maze = new int[rows][cols];
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                maze[r][c] = 1; // WALL
+            }
+        }
     }
 
     public static void main(String[] args) {

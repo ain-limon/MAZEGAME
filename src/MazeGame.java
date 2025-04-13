@@ -26,37 +26,22 @@ public class MazeGame extends JPanel {
         setFocusable(true);
         generateMaze();
         start = new Point(1, 1);
-
         findRandomExit();
-        maze[start.x][start.y] = 2;
-        maze[exit.x][exit.y] = 3;
+        maze[start.x][start.y] = -1;
+        maze[exit.x][exit.y] = -2;
         findPath();
     }
 
     private void findRandomExit() {
         Random random = new Random();
-        int side = random.nextInt(4); // 0: верх, 1: право, 2: низ, 3: лево
+        int side = random.nextInt(4);
         int r, c;
         switch (side) {
-            case 0:
-                r = 0;
-                c = random.nextInt(cols - 2) + 1;
-                break;
-            case 1:
-                r = random.nextInt(rows - 2) + 1;
-                c = cols - 1;
-                break;
-            case 2:
-                r = rows - 1;
-                c = random.nextInt(cols - 2) + 1;
-                break;
-            case 3:
-                r = random.nextInt(rows - 2) + 1;
-                c = 0;
-                break;
-            default:
-                r = rows - 1;
-                c = cols - 1;
+            case 0: r = 0; c = random.nextInt(cols - 2) + 1; break;
+            case 1: r = random.nextInt(rows - 2) + 1; c = cols - 1; break;
+            case 2: r = rows - 1; c = random.nextInt(cols - 2) + 1; break;
+            case 3: r = random.nextInt(rows - 2) + 1; c = 0; break;
+            default: r = rows - 1; c = cols - 1;
         }
         exit = new Point(r, c);
     }
@@ -69,8 +54,6 @@ public class MazeGame extends JPanel {
             }
         }
         recursiveBacktracking(1, 1);
-
-
         if (maze[1][1] == 1) maze[1][1] = 0;
         if (exit.x > 0 && exit.x < rows - 1 && exit.y > 0 && exit.y < cols - 1 && maze[exit.x][exit.y] == 1) {
             maze[exit.x][exit.y] = 0;
@@ -82,12 +65,11 @@ public class MazeGame extends JPanel {
     private void recursiveBacktracking(int r, int c) {
         int[][] directions = {{0, 2}, {2, 0}, {0, -2}, {-2, 0}};
         shuffleArray(directions);
-        maze[r][c] = 0; // PATH
-
+        maze[r][c] = 0;
         for (int[] d : directions) {
             int nr = r + d[0], nc = c + d[1];
             if (nr > 0 && nr < rows - 1 && nc > 0 && nc < cols - 1 && maze[nr][nc] == 1) {
-                maze[r + d[0] / 2][c + d[1] / 2] = 0; // PATH
+                maze[r + d[0] / 2][c + d[1] / 2] = 0;
                 recursiveBacktracking(nr, nc);
             }
         }
@@ -105,20 +87,16 @@ public class MazeGame extends JPanel {
         }
         visited[r][c] = true;
         solutionPath.add(new Point(r, c));
-
         if (r == exit.x && c == exit.y) {
             return true;
         }
-
         int[] dr = {-1, 1, 0, 0};
         int[] dc = {0, 0, -1, 1};
-
         for (int i = 0; i < 4; i++) {
             if (solveMazeRecursive(r + dr[i], c + dc[i], visited)) {
                 return true;
             }
         }
-
         solutionPath.remove(solutionPath.size() - 1);
         return false;
     }
@@ -136,38 +114,34 @@ public class MazeGame extends JPanel {
             array[j] = temp;
         }
     }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 switch (maze[r][c]) {
-                    case 1:
-                        g.setColor(Color.GREEN);
-                        break;
-                    case 0:
-                        g.setColor(Color.WHITE);
-                        break;
-                    case 2:
-                        g.setColor(Color.BLUE);
-                        break;
-                    case 3:
-                        g.setColor(Color.YELLOW);
-                        break;
-                    default:
-                        g.setColor(Color.WHITE);
+                    case 1: g.setColor(Color.GREEN); break;
+                    case 0: g.setColor(Color.WHITE); break;
+                    default: g.setColor(Color.WHITE);
                 }
                 g.fillRect(c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
             }
         }
-
-        // Отрисовка найденного пути
-        g.setColor(new Color(139, 69, 19)); // Коричневый цвет для пути
+        g.setColor(new Color(139, 69, 19));
         if (solutionPath != null) {
             for (Point p : solutionPath) {
                 g.fillRect(p.y * CELL_SIZE, p.x * CELL_SIZE, CELL_SIZE, CELL_SIZE);
             }
         }
+        g.setColor(Color.RED);
+        int startX = start.y * CELL_SIZE + CELL_SIZE / 2;
+        int startY = start.x * CELL_SIZE + CELL_SIZE / 2;
+        int[] xPoints = {startX - CELL_SIZE / 2, startX, startX + CELL_SIZE / 2, startX};
+        int[] yPoints = {startY, startY - CELL_SIZE / 2, startY, startY + CELL_SIZE / 2};
+        g.fillPolygon(xPoints, yPoints, 4);
+        g.setColor(Color.YELLOW);
+        g.fillRect(exit.y * CELL_SIZE, exit.x * CELL_SIZE, CELL_SIZE, CELL_SIZE);
     }
 
     public static void main(String[] args) {

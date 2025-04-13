@@ -145,13 +145,46 @@ public class MazeGame extends JPanel {
     }
 
     public static void main(String[] args) {
+        int rows = 0, cols = 0;
+        int defaultSize = 50;
+        int minSize = 5;
+        int maxSize = 100;
+
+        try {
+            String rowsStr = JOptionPane.showInputDialog("Введите количество строк (минимум " + minSize + ", максимум " + maxSize + "):");
+            if (rowsStr == null) {
+                rows = defaultSize;
+            } else {
+                rows = Integer.parseInt(rowsStr);
+                if (rows < minSize || rows > maxSize) {
+                    JOptionPane.showMessageDialog(null, "Некорректный ввод строк. Установлено значение по умолчанию: " + defaultSize, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    rows = defaultSize;
+                }
+            }
+
+            String colsStr = JOptionPane.showInputDialog("Введите количество столбцов (минимум " + minSize + ", максимум " + maxSize + "):");
+            if (colsStr == null) {
+                cols = defaultSize;
+            } else {
+                cols = Integer.parseInt(colsStr);
+                if (cols < minSize || cols > maxSize) {
+                    JOptionPane.showMessageDialog(null, "Некорректный ввод столбцов. Установлено значение по умолчанию: " + defaultSize, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    cols = defaultSize;
+                }
+            }
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Некорректный формат ввода. Используются размеры по умолчанию: " + defaultSize + "x" + defaultSize, "Ошибка", JOptionPane.ERROR_MESSAGE);
+            rows = defaultSize;
+            cols = defaultSize;
+        }
+
         SwingUtilities.invokeLater(() -> {
-            int rows = 30;
-            int cols = 40;
-            JFrame frame = new JFrame("Maze Game");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(new MazeGame(rows, cols));
+            JFrame frame = new JFrame("Maze Solver");
+            MazeGame game = new MazeGame(rows, cols);
+            frame.add(game);
             frame.pack();
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });

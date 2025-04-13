@@ -26,10 +26,10 @@ public class MazeGame extends JPanel {
         setFocusable(true);
         generateMaze();
         start = new Point(1, 1);
-        // Ищем случайную точку выхода на границе лабиринта
+
         findRandomExit();
-        maze[start.x][start.y] = 2; // Обозначим старт другим цветом
-        maze[exit.x][exit.y] = 3;  // EXIT
+        maze[start.x][start.y] = 2;
+        maze[exit.x][exit.y] = 3;
         findPath();
     }
 
@@ -38,19 +38,19 @@ public class MazeGame extends JPanel {
         int side = random.nextInt(4); // 0: верх, 1: право, 2: низ, 3: лево
         int r, c;
         switch (side) {
-            case 0: // Верхняя граница
+            case 0:
                 r = 0;
                 c = random.nextInt(cols - 2) + 1;
                 break;
-            case 1: // Правая граница
+            case 1:
                 r = random.nextInt(rows - 2) + 1;
                 c = cols - 1;
                 break;
-            case 2: // Нижняя граница
+            case 2:
                 r = rows - 1;
                 c = random.nextInt(cols - 2) + 1;
                 break;
-            case 3: // Левая граница
+            case 3:
                 r = random.nextInt(rows - 2) + 1;
                 c = 0;
                 break;
@@ -65,12 +65,12 @@ public class MazeGame extends JPanel {
         maze = new int[rows][cols];
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                maze[r][c] = 1; // WALL
+                maze[r][c] = 1;
             }
         }
         recursiveBacktracking(1, 1);
 
-        // Убедимся, что старт и выход находятся внутри прохода
+
         if (maze[1][1] == 1) maze[1][1] = 0;
         if (exit.x > 0 && exit.x < rows - 1 && exit.y > 0 && exit.y < cols - 1 && maze[exit.x][exit.y] == 1) {
             maze[exit.x][exit.y] = 0;
@@ -142,29 +142,18 @@ public class MazeGame extends JPanel {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 switch (maze[r][c]) {
-                    case 1:
-                        g.setColor(Color.GREEN); // WALL
+                    case 1: g.setColor(Color.GREEN);
                         break;
-                    case 0:
-                        g.setColor(Color.WHITE); // PATH
+                    case 0: g.setColor(Color.WHITE);
                         break;
-                    case 2:
-                        g.setColor(Color.BLUE);  // START
+                    case 2: g.setColor(Color.BLUE);
                         break;
-                    case 3:
-                        g.setColor(Color.YELLOW); // EXIT
+                    case 3: g.setColor(Color.YELLOW);
                         break;
-                    default:
-                        g.setColor(Color.WHITE);
+                    default: g.setColor(Color.WHITE);
                 }
                 g.fillRect(c * CELL_SIZE, r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
             }
-        }
-
-        // Отрисовка найденного пути
-        g.setColor(Color.RED); // Цвет пути
-        for (Point p : solutionPath) {
-            g.fillRect(p.y * CELL_SIZE, p.x * CELL_SIZE, CELL_SIZE, CELL_SIZE);
         }
     }
 

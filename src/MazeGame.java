@@ -6,8 +6,8 @@ import java.util.Random;
 
 public class MazeGame extends JPanel {
     private static final int CELL_SIZE = 15;
-    private int rows;
-    private int cols;
+    private final int rows;
+    private final int cols;
     private int[][] maze;
     private Point start;
     private Point exit;
@@ -24,9 +24,9 @@ public class MazeGame extends JPanel {
         }
         setPreferredSize(new Dimension(this.cols * CELL_SIZE, this.rows * CELL_SIZE));
         setFocusable(true);
-        generateMaze();
         start = new Point(1, 1);
-        findRandomExit();
+        findRandomExit(); // Initialize 'exit' before generateMaze uses it
+        generateMaze();
         maze[start.x][start.y] = -1;
         maze[exit.x][exit.y] = -2;
         findPath();
@@ -46,6 +46,18 @@ public class MazeGame extends JPanel {
         exit = new Point(r, c);
     }
 
+    private void printMazeToConsole() {
+        System.out.println("Сгенерированный лабиринт (консоль):");
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                System.out.print(maze[r][c] == 1 ? "#" : (maze[r][c] == -2 ? "E" : (maze[r][c] == -1 ? "S" : " ")));
+            }
+            System.out.println();
+        }
+        System.out.println("Старт: " + start.x + "," + start.y);
+        System.out.println("Выход: " + exit.x + "," + exit.y);
+    }
+
     private void generateMaze() {
         maze = new int[rows][cols];
         for (int r = 0; r < rows; r++) {
@@ -60,6 +72,7 @@ public class MazeGame extends JPanel {
         } else if ((exit.x == 0 || exit.x == rows - 1 || exit.y == 0 || exit.y == cols - 1) && maze[exit.x][exit.y] == 1) {
             maze[exit.x][exit.y] = 0;
         }
+        printMazeToConsole();
     }
 
     private void recursiveBacktracking(int r, int c) {
@@ -145,39 +158,50 @@ public class MazeGame extends JPanel {
     }
 
     public static void main(String[] args) {
-        int rows = 0, cols = 0;
+        final int rows;
+        final int cols;
         int defaultSize = 50;
         int minSize = 5;
         int maxSize = 100;
 
+        int tempRows = defaultSize;
+        int tempCols = defaultSize;
+
         try {
             String rowsStr = JOptionPane.showInputDialog("Введите количество строк (минимум " + minSize + ", максимум " + maxSize + "):");
             if (rowsStr == null) {
-                rows = defaultSize;
+                tempRows = defaultSize;
             } else {
-                rows = Integer.parseInt(rowsStr);
-                if (rows < minSize || rows > maxSize) {
+                int parsedRows = Integer.parseInt(rowsStr);
+                if (parsedRows < minSize || parsedRows > maxSize) {
                     JOptionPane.showMessageDialog(null, "Некорректный ввод строк. Установлено значение по умолчанию: " + defaultSize, "Ошибка", JOptionPane.ERROR_MESSAGE);
-                    rows = defaultSize;
+                    tempRows = defaultSize;
+                } else {
+                    tempRows = parsedRows;
                 }
             }
 
             String colsStr = JOptionPane.showInputDialog("Введите количество столбцов (минимум " + minSize + ", максимум " + maxSize + "):");
             if (colsStr == null) {
-                cols = defaultSize;
+                tempCols = defaultSize;
             } else {
-                cols = Integer.parseInt(colsStr);
-                if (cols < minSize || cols > maxSize) {
+                int parsedCols = Integer.parseInt(colsStr);
+                if (parsedCols < minSize || parsedCols > maxSize) {
                     JOptionPane.showMessageDialog(null, "Некорректный ввод столбцов. Установлено значение по умолчанию: " + defaultSize, "Ошибка", JOptionPane.ERROR_MESSAGE);
-                    cols = defaultSize;
+                    tempCols = defaultSize;
+                } else {
+                    tempCols = parsedCols;
                 }
             }
 
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Некорректный формат ввода. Используются размеры по умолчанию: " + defaultSize + "x" + defaultSize, "Ошибка", JOptionPane.ERROR_MESSAGE);
-            rows = defaultSize;
-            cols = defaultSize;
+            tempRows = defaultSize;
+            tempCols = defaultSize;
         }
+
+        rows = tempRows;
+        cols = tempCols;
 
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Maze Solver");
